@@ -38,7 +38,7 @@ IO --> MODEL
 
 **Composite**：`Group` 与叶子都继承 `Shape`；`move`、`scale`、`set`、`delete` 均按 id 定位同一个抽象类型。容器递归操作子图形，删除/移动容器即操作整棵子树。创建时可通过 `in` 指定父容器；`group` 和 `addto` 处理已存在图形。
 
-**Factory Method 的简化实现**：`ShapeFactory` 集中负责类型名、参数到图形实例的映射。当前使用 `switch(type)`，是本阶段允许的两处按名字分派之一；未来插件化可改成 `ShapeProvider` 注册表。另一处命令名分派位于 `Cli` 的 handler 映射；新增命令仍须修改 CLI，未来可改成命令注册接口。这两处均标为待重构项，内核没有其它 `switch(tag)`。
+**简单工厂**：`ShapeFactory` 集中负责类型名、参数到图形实例的映射。当前使用 `switch(type)`，是本阶段允许的两处按名字分派之一；未来插件化可改成 `ShapeProvider` 注册表。另一处命令名分派位于 `Cli` 的 handler 映射；新增命令仍须修改 CLI，未来可改成命令注册接口。这两处均标为待重构项，内核没有其它 `switch(tag)`。
 
 ### 依赖方向规则
 
@@ -80,6 +80,6 @@ IO --> MODEL
 ## 质量保证手段
 
 - `pnpm build`：TypeScript 严格模式编译通过。
-- `pnpm test`：5 个集成测试通过，覆盖六类图形、嵌套容器、group/ungroup、撤销/重做与 redo 清空、IO 历史边界、读写往返与 XML 转义、自动补 id、重复 id、非法参数、失败原子性和循环保护。
+- `pnpm test`：7 个集成测试通过，覆盖六类图形、嵌套容器、group/ungroup、z-order、撤销/重做与 redo 清空、画布和 IO 历史边界、读写往返与 XML 转义、自动补 id、重复 id、非法参数、失败原子性和循环保护。
 - `examples/flowchart.cli`：按作业中的两节点流程图顺序回放，可在浏览器中预览生成的 `examples/flowchart.svg`。
 - 限制：尚未实现后续阶段的 `box` 插件。读入面向本阶段六种内置图形，不保证任意 SVG 标准文件的全量保真。

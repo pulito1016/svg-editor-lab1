@@ -86,3 +86,40 @@ test("all six shape types, numeric validation, cycle protection and unsupported 
   assert.equal(cli.executeLine("create rect r 1 2 3 4")[0], "error: id already exists: r");
   assert.equal(cli.executeLine("tree")[0].match(/rect#r/g)?.length, 1);
 });
+
+test("canvas IO boundary, ordering, and save to previously read path", () => {
+  const cli = new Cli();
+  const dir = mkdtempSync(join(tmpdir(), "svg-lab-"));
+  const path = join(dir, "scene.svg");
+  for (const command of ["init 100 50", "create rect a 0 0 1 1", "create rect b 2 0 1 1"]) cli.executeLine(command);
+  cli.executeLine("front a");
+  assert.match(cli.executeLine("tree")[0], /rect#b[\s\S]*rect#a/);
+  cli.executeLine("back a");
+  assert.match(cli.executeLine("tree")[0], /rect#a[\s\S]*rect#b/);
+  assert.equal(cli.executeLine("canvas")[0], "canvas 100x50");
+  assert.equal(cli.executeLine("canvas 200 80")[0], "canvas resized to 200x80");
+  assert.equal(cli.executeLine("undo")[0], "error: undo not allowed after io command");
+  cli.executeLine(`save ${path}`);
+  assert.match(cli.executeLine(`read ${path}`)[0], /read /);
+  cli.executeLine("set a fill green");
+  assert.match(cli.executeLine("save")[0], /saved to/);
+  assert.match(readFileSync(path, "utf8"), /fill="green"/);
+});
+
+test("external SVG sample imports auto ids and nested structure", () => {
+  const cli = new Cli();
+  const dir = mkdtempSync(join(tmpdir(), "svg-lab-"));
+  const path = join(dir, "external.svg");
+  writeFileSync(path, `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect x="0" y="0" width="400" height="300" fill="#ffffff"/>
+  <text id="t1" x="10" y="290">imported</text>
+  <circle id="c1" cx="50" cy="50" r="10"/>
+  <g id="g1"><rect id="r2" x="0" y="0" width="10" height="10"/><circle id="c2" cx="5" cy="5" r="2"/></g>
+  <ellipse id="e1" cx="1" cy="2" rx="3" ry="4"/>
+</svg>`);
+  const result = cli.executeLine(`read ${path}`);
+  assert.equal(result[0], "warning: assigned id rect1 to unnamed <rect>");
+  assert.equal(result[1], `read ${path} (7 elements)`);
+  assert.match(cli.executeLine("tree")[0], /g#g1[\s\S]*rect#r2[\s\S]*circle#c2[\s\S]*ellipse#e1/);
+});
