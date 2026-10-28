@@ -1,0 +1,15 @@
+@startuml
+package "CLI" as CLI
+package "Session" as SESSION
+package "Commands" as COMMANDS
+package "SVG IO" as IO
+package "Model" as MODEL
+CLI --> SESSION
+CLI --> COMMANDS
+CLI --> IO
+CLI --> MODEL
+SESSION --> COMMANDS
+SESSION --> MODEL
+COMMANDS --> MODEL
+IO --> MODEL
+@enduml

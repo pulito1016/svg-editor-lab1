@@ -1,5 +1,7 @@
 # SVG 编辑器 CLI（Lab1 Phase 1）
 
+Git 仓库：https://github.com/pulito1016/svg-editor-lab1
+
 TypeScript 实现的命令行 SVG 编辑器。支持 rect、circle、ellipse、line、text、g 六种类型，以及嵌套容器、读写 SVG、撤销重做。
 
 ## 运行

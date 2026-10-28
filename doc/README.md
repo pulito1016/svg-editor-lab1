@@ -1,5 +1,7 @@
 # Lab1 Phase 1：SVG 编辑器（CLI）实验文档
 
+**Git 仓库地址：** https://github.com/pulito1016/svg-editor-lab1
+
 ## 架构方案
 
 ### 模块划分
@@ -11,6 +13,10 @@
 | 命令 | `src/commands/` | Command 对象执行、撤销、重做；一次编辑命令对应一个历史单元 |
 | SVG IO | `src/io/` | SVG XML 解析、缺失 id 分配、序列化与转义 |
 | 模型 | `src/model/` | 图形类层次、多态几何操作、Composite 容器、文档不变量 |
+
+![SVG 编辑器模块依赖图](architecture.svg)
+
+图的 PlantUML 源文件见 [architecture.puml](architecture.puml)。
 
 ```plantuml
 @startuml
